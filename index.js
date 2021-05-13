@@ -61,7 +61,7 @@ function formatDescription(replace, getInput) {
 }
 
 function format(template, find, replace) {
-  return template.replace(find, replace ?? '');
+  return template.replace(find, replace || '');
 }
 
 
