@@ -15,9 +15,9 @@ async function run(inject = {}) {
     const token = getInput("token");
     const client = getClient(token);
 
-    const releases = await client.repos.listReleases(context);
+    const { data } = await client.repos.listReleases(context);
 
-    const { changelog, latest } = getChangelogAndLatest(releases, inject);
+    const { changelog, latest } = getChangelogAndLatest(data, inject);
 
     setOutput("changelog", changelog);
     setOutput("latest", latest);
