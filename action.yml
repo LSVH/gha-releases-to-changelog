@@ -1,5 +1,9 @@
 name: 'Releases to Changelog'
 description: 'Convert the list of releases to a changelog'
+author: LSVH
+branding:
+  icon: edit
+  color: green
 inputs:
   title-template:
     required: false
