@@ -5,8 +5,10 @@ if (require.main === module) {
   run();
 }
 
-async function run() {
+async function run(inject = {}) {
   try {
+    const setOutput = inject.setOutput || core.setOutput;
+
     const github = new GitHub(process.env.GITHUB_TOKEN);
     const { owner, repo } = context.repo;
 
@@ -15,17 +17,18 @@ async function run() {
       repo,
     });
 
-    const {changelog, latest} = getChangelogAndLatest(releases);
+    const {changelog, latest} = getChangelogAndLatest(releases, inject);
 
-    core.setOutput("changelog", changelog);
-    core.setOutput("latest", latest);
+    setOutput("changelog", changelog);
+    setOutput("latest", latest);
   } catch (error) {
     core.setFailed(error.message);
   }
 }
 
-function getChangelogAndLatest(releases, callback) {
-  const getTemplate = callback ?? core.getInput;
+function getChangelogAndLatest(releases, inject) {
+  const getInput = inject.getInput || core.getInput;
+
   const latest = { tag: null, date: null };
   const changelog = releases.map(
     ({ tag_name, draft, published_at, name, body }) => {
@@ -39,8 +42,8 @@ function getChangelogAndLatest(releases, callback) {
         latest.tag = tag_name;
       }
 
-      const title = formatTitle(name, getTemplate);
-      const description = formatDescription(body, getTemplate);
+      const title = formatTitle(name, getInput);
+      const description = formatDescription(body, getInput);
 
       return title + "\n\n" + description;
     }
@@ -49,12 +52,12 @@ function getChangelogAndLatest(releases, callback) {
   return { changelog, latest: latest.tag };
 }
 
-function formatTitle(replace, getTemplate) {
-  return format(getTemplate("title-template"), "%%TITLE%%", replace);
+function formatTitle(replace, getInput) {
+  return format(getInput("title-template"), "%%TITLE%%", replace);
 }
 
-function formatDescription(replace, getTemplate) {
-  return format(getTemplate("description-template"), "%%DESCRIPTION%%", replace);
+function formatDescription(replace, getInput) {
+  return format(getInput("description-template"), "%%DESCRIPTION%%", replace);
 }
 
 function format(template, find, replace) {

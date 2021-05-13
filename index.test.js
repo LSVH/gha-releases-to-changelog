@@ -27,11 +27,13 @@ const templates = {
   "title-template": "%%TITLE%%",
   "description-template": "%%DESCRIPTION%%",
 };
-const getTemplate = jest.fn((tag) => templates[tag]);
+const injections = {
+  getInput: jest.fn((tag) => templates[tag]),
+};
 
 describe("getChangelogAndLatest()", () => {
   test("with one valid entry", () => {
-    const { changelog, latest } = getChangelogAndLatest([v1], getTemplate);
+    const { changelog, latest } = getChangelogAndLatest([v1], injections);
 
     expect(latest).toBe(v1.tag_name);
 
@@ -40,7 +42,7 @@ describe("getChangelogAndLatest()", () => {
   });
 
   test("with two valid entries", () => {
-    const { changelog, latest } = getChangelogAndLatest([v1, v2], getTemplate);
+    const { changelog, latest } = getChangelogAndLatest([v1, v2], injections);
 
     expect(latest).toBe(v2.tag_name);
 
@@ -49,7 +51,7 @@ describe("getChangelogAndLatest()", () => {
   });
 
   test("with one valid draft and two valid entries", () => {
-    const { changelog, latest } = getChangelogAndLatest([v0, v1, v2], getTemplate);
+    const { changelog, latest } = getChangelogAndLatest([v0, v1, v2], injections);
 
     expect(latest).toBe(v2.tag_name);
 
@@ -61,7 +63,7 @@ describe("getChangelogAndLatest()", () => {
     test("with an invalid date string for `published_at`", () => {
       const actual = {...v1, ...{published_at: 'foobar'}};
 
-      const { changelog, latest } = getChangelogAndLatest([actual], getTemplate);
+      const { changelog, latest } = getChangelogAndLatest([actual], injections);
   
       expect(latest).toBe(actual.tag_name);
   
@@ -73,7 +75,7 @@ describe("getChangelogAndLatest()", () => {
       const actual = {...{}, ...v1};
       delete actual.name;
 
-      const { changelog, latest } = getChangelogAndLatest([actual], getTemplate);
+      const { changelog, latest } = getChangelogAndLatest([actual], injections);
   
       expect(latest).toBe(actual.tag_name);
   
@@ -85,7 +87,7 @@ describe("getChangelogAndLatest()", () => {
       const actual = {...{}, ...v1};
       delete actual.body;
 
-      const { changelog, latest } = getChangelogAndLatest([actual], getTemplate);
+      const { changelog, latest } = getChangelogAndLatest([actual], injections);
   
       expect(latest).toBe(actual.tag_name);
   
@@ -97,7 +99,7 @@ describe("getChangelogAndLatest()", () => {
       const actual = {...{}, ...v1};
       delete actual.tag_name;
 
-      const { changelog, latest } = getChangelogAndLatest([actual], getTemplate);
+      const { changelog, latest } = getChangelogAndLatest([actual], injections);
   
       expect(latest).toBe(actual.tag_name);
   
@@ -109,7 +111,7 @@ describe("getChangelogAndLatest()", () => {
       const actual = {...{}, ...v1};
       delete actual.published_at;
 
-      const { changelog, latest } = getChangelogAndLatest([actual], getTemplate);
+      const { changelog, latest } = getChangelogAndLatest([actual], injections);
   
       expect(latest).toBe(actual.tag_name);
   
