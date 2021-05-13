@@ -26,7 +26,7 @@ The tag name of the latest release.
 
 ```
 -   name: Generate markdown changelog
-    uses: LSVH/releases-to-changelog@v1
+    uses: LSVH/gha-releases-to-changelog@v1
     with:
         title-template: '# %%TITLE%%'
 ```
