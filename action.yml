@@ -1,0 +1,19 @@
+name: 'Releases to Changelog'
+description: 'Convert the list of releases to a changelog'
+inputs:
+  title-template:
+    required: false
+    default: '%%TITLE%%'
+    description: 'Configure the title of the release'
+  description-template:
+    required: false
+    default: '%%DESCRIPTION%%'
+    description: 'Configure the description of the release'
+outputs:
+  changelog:
+    description: 'The changelog that was generated'
+  latest:
+    description: 'The tag name of the latest release'
+runs:
+  using: 'node12'
+  main: 'index.js'

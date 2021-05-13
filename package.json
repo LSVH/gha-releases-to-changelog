@@ -1,0 +1,23 @@
+{
+  "name": "gha-releases-to-changelog",
+  "version": "1.0.0",
+  "description": "Convert the list of releases to a changelog",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --watchAll"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github-luuk:LSVH/gha-releases-to-changelog"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@actions/core": "^1.2.7",
+    "@actions/github": "^4.0.0"
+  },
+  "devDependencies": {
+    "jest": "^26.6.3"
+  }
+}
