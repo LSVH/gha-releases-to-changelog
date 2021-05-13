@@ -5,7 +5,7 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const core = __nccwpck_require__(127);
-const { GitHub, context } = __nccwpck_require__(134);
+const github = __nccwpck_require__(134);
 
 if (require.main === require.cache[eval('__filename')]) {
   run();
@@ -15,10 +15,10 @@ async function run(inject = {}) {
   try {
     const setOutput = inject.setOutput || core.setOutput;
 
-    const github = new GitHub(process.env.GITHUB_TOKEN);
-    const { owner, repo } = context.repo;
+    const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+    const { owner, repo } = github.context.repo;
 
-    const releases = await github.repos.listReleases({
+    const releases = await octokit.repos.listReleases({
       owner,
       repo,
     });

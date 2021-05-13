@@ -1,5 +1,5 @@
 const core = require("@actions/core");
-const { GitHub, context } = require("@actions/github");
+const github = require("@actions/github");
 
 if (require.main === module) {
   run();
@@ -9,10 +9,10 @@ async function run(inject = {}) {
   try {
     const setOutput = inject.setOutput || core.setOutput;
 
-    const github = new GitHub(process.env.GITHUB_TOKEN);
-    const { owner, repo } = context.repo;
+    const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+    const { owner, repo } = github.context.repo;
 
-    const releases = await github.repos.listReleases({
+    const releases = await octokit.repos.listReleases({
       owner,
       repo,
     });
