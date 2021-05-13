@@ -33,6 +33,10 @@ async function run(inject = {}) {
 }
 
 function getChangelogAndLatest(releases, inject) {
+  if (!Array.isArray(releases)) {
+    throw new Error(`Expected array but got ${typeof releases}`);
+  }
+
   const getInput = inject.getInput || core.getInput;
 
   const latest = { tag: null, date: null };
