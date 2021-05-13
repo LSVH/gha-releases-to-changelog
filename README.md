@@ -4,6 +4,10 @@ Convert the list of releases to a changelog
 
 ## Inputs
 
+### `token`
+
+**Required**: The GITHUB_TOKEN secret.
+
 ### `title-template`
 
 Configure the title of the release. Default: `%%TITLE%%`.

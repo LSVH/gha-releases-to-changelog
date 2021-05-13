@@ -7,17 +7,17 @@ if (require.main === module) {
 
 async function run(inject = {}) {
   try {
+    const getInput = inject.getInput || core.getInput;
     const setOutput = inject.setOutput || core.setOutput;
+    const getClient = inject.getClient || github.getOctokit;
+    const context = inject.context || github.context.repo;
 
-    const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
-    const { owner, repo } = github.context.repo;
+    const token = getInput("token");
+    const client = getClient(token);
 
-    const releases = await octokit.repos.listReleases({
-      owner,
-      repo,
-    });
+    const releases = await client.repos.listReleases(context);
 
-    const {changelog, latest} = getChangelogAndLatest(releases, inject);
+    const { changelog, latest } = getChangelogAndLatest(releases, inject);
 
     setOutput("changelog", changelog);
     setOutput("latest", latest);
@@ -30,8 +30,8 @@ function getChangelogAndLatest(releases, inject) {
   const getInput = inject.getInput || core.getInput;
 
   const latest = { tag: null, date: null };
-  const changelog = releases.map(
-    ({ tag_name, draft, published_at, name, body }) => {
+  const changelog = releases
+    .map(({ tag_name, draft, published_at, name, body }) => {
       if (draft) {
         return null;
       }
@@ -46,8 +46,9 @@ function getChangelogAndLatest(releases, inject) {
       const description = formatDescription(body, getInput);
 
       return title + "\n\n" + description;
-    }
-  ).filter(Boolean).join("\n\n");
+    })
+    .filter(Boolean)
+    .join("\n\n");
 
   return { changelog, latest: latest.tag };
 }
@@ -61,8 +62,7 @@ function formatDescription(replace, getInput) {
 }
 
 function format(template, find, replace) {
-  return template.replace(find, replace || '');
+  return template.replace(find, replace || "");
 }
 
-
-module.exports = {run, getChangelogAndLatest}
+module.exports = { run, getChangelogAndLatest };

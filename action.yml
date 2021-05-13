@@ -5,6 +5,9 @@ branding:
   icon: edit
   color: green
 inputs:
+  token:
+    required: true
+    description: 'The GITHUB_TOKEN secret'
   title-template:
     required: false
     default: '%%TITLE%%'
