@@ -2,22 +2,30 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 
 if (require.main === module) {
-  run();
+  const getListReleases = (token) =>
+    github.getOctokit(token).repos.listReleases;
+  run({
+    getInput: core.getInput,
+    setOutput: core.setOutput,
+    listReleases: getListReleases,
+    context: github.context.repo,
+  });
 }
 
-async function run(inject = {}) {
+async function run({
+  getInput,
+  setOutput,
+  listReleases,
+  context,
+}) {
   try {
-    const getInput = inject.getInput || core.getInput;
-    const setOutput = inject.setOutput || core.setOutput;
-    const getClient = inject.getClient || github.getOctokit;
-    const context = inject.context || github.context.repo;
-
     const token = getInput("token");
-    const client = getClient(token);
 
-    const { data } = await client.repos.listReleases(context);
+    console.info("Started retrieving releases");
+    const request = listReleases(token);
+    const { data } = await request(context);
 
-    const { changelog, latest } = getChangelogAndLatest(data, inject);
+    const { changelog, latest } = getChangelogAndLatest(data, {getInput});
 
     setOutput("changelog", changelog);
     setOutput("latest", latest);
@@ -26,17 +34,19 @@ async function run(inject = {}) {
   }
 }
 
-function getChangelogAndLatest(releases, inject) {
+function getChangelogAndLatest(releases, {getInput}) {
   if (!Array.isArray(releases)) {
-    throw new Error(`Expected array but got ${typeof releases}`);
+    throw new Error(
+      `Expected an array back as response, but got "${typeof releases}"`
+    );
   }
 
-  const getInput = inject.getInput || core.getInput;
-
+  const spacing = "\n\n";
   const latest = { tag: null, date: null };
   const changelog = releases
     .map(({ tag_name, draft, published_at, name, body }) => {
       if (draft) {
+        console.info(`Skipping draft with the name "${name}"`);
         return null;
       }
 
@@ -49,10 +59,10 @@ function getChangelogAndLatest(releases, inject) {
       const title = formatTitle(name, getInput);
       const description = formatDescription(body, getInput);
 
-      return title + "\n\n" + description;
+      return [title, description].filter(Boolean).join(spacing);
     })
     .filter(Boolean)
-    .join("\n\n");
+    .join(spacing);
 
   return { changelog, latest: latest.tag };
 }
