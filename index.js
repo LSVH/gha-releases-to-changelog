@@ -56,7 +56,7 @@ function getChangelogAndLatest(releases, {getInput}) {
         latest.tag = tag_name;
       }
 
-      const title = formatTitle(name, getInput);
+      const title = formatTitle(name || tag_name, getInput);
       const description = formatDescription(body, getInput);
 
       return [title, description].filter(Boolean).join(spacing);
